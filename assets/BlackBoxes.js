@@ -40,8 +40,8 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   colon: {
-    color: 'white',
-    fontSize: 48,
+    color: 'black',
+    fontSize: 96,
     alignSelf: 'center',
   },
 });
