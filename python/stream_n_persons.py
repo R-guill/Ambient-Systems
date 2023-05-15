@@ -69,6 +69,10 @@ hog.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
 client = connect_mqtt()
 client.loop_start()
 
+# Get time estimation data
+# data = np.array([55, 60, 45, 70, 80])
+
+# np.save('time_estimation_data.npy', data)
 
 try:
     while True:

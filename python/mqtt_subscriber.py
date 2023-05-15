@@ -3,16 +3,17 @@
 import random
 
 from paho.mqtt import client as mqtt_client
+from mqtt_publisher import load_data, save_data
+import numpy as np
 
 
 broker = 'broker.emqx.io'
 port = 1883
-topic = "Coffee Rush"
+topic = "CoffeeRush/AddWaitingTime"
 # generate client ID with pub prefix randomly
 client_id = f'python-mqtt-{random.randint(0, 100)}'
 # username = 'emqx'
 # password = 'public'
-
 
 def connect_mqtt() -> mqtt_client:
     def on_connect(client, userdata, flags, rc):
@@ -30,7 +31,9 @@ def connect_mqtt() -> mqtt_client:
 
 def subscribe(client: mqtt_client):
     def on_message(client, userdata, msg):
+        np.append(load_data(), int(msg.payload.decode()))
         print(f"Received `{msg.payload.decode()}` from `{msg.topic}` topic")
+        save_data(load_data())
 
     client.subscribe(topic)
     client.on_message = on_message
