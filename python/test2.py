@@ -8,7 +8,7 @@
 import pyrealsense2 as rs
 import numpy as np
 import cv2
-import httpx
+from mqtt_publisher import connect_mqtt, publish
 
 def auto_canny(image, sigma=0.33):
     # compute the median of the single channel pixel intensities
@@ -65,6 +65,9 @@ pipeline.start(config)
 hog = cv2.HOGDescriptor()
 hog.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
 
+client = connect_mqtt()
+client.loop_start()
+
 
 try:
     while True:
@@ -106,7 +109,7 @@ try:
                         (x + w, y + h), 
                         (0, 0, 255), 2)
         n_persons = len(regions)
-        httpx.get('https://192.168.43.253:19000', data={'n_persons': n_persons})
+        publish(client, n_persons)
         # print(len(regions))
 
         # Show images
