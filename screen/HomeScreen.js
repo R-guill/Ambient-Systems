@@ -19,33 +19,33 @@ const HomePage = () => {
   const latestMessage = useRef(null);
   
   
+  
   useEffect(() => {
     const client = new Client("ws://broker.emqx.io:8083/mqtt", "clientId");
 
     function onConnect() {
       console.log("Connected to MQTT broker");
-      client.subscribe("Coffee Rush");
+      client.subscribe("CoffeeRush");
       console.log("Subscribed to topic");
-      client.publish("Coffee Rush", "Subscribed to topic from react native");
+      client.publish("CoffeeRush", "Subscribed to topic from react native");
     }
 
     function onMessageArrived(message) {
       latestMessage.current = message.payloadString;
-      console.log("Received message:", message.payloadString);
-      client.publish("Coffee Rush", "Received message from react native");
-      requestAnimationFrame(updatePeopleInQueue);     
+      console.log("Received message:", latestMessage.current);
+      //client.publish("Coffee Rush", "Received message from react native");
+      setPeopleInQueue(parseInt(latestMessage.current)); 
+      
+     
       
     }
     
-    function updatePeopleInQueue() {
-      setPeopleInQueue(parseInt(latestMessage.current)); 
-      console.log("Variable",peopleInQueue);
-    }
+    
     client.onMessageArrived = onMessageArrived;
     client.connect({
       onSuccess: onConnect,
     });
-
+    
     
 
     
@@ -55,22 +55,17 @@ const HomePage = () => {
     };
    }, []);
 
-   
+   useEffect(() => {
+    console.log("peopleInQueue",peopleInQueue);
+    const [min,sec]=waitTime(peopleInQueue);
+    setLeftValue(min);
+    setRightValue(sec);
+  }, [peopleInQueue]);
   
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setRightValue((prevRightValue) => {
-        if (prevRightValue > 0) {
-          return prevRightValue - 1;
-        } else {
-          return 0;
-        }
-      });
-    }, 1000);
+  
 
-    return () => clearInterval(timer);
-  }, []);
+  
 
   useEffect(() => {
     if (rightValue === 0 && leftValue === 0) {
