@@ -26,14 +26,14 @@ const HomePage = () => {
       console.log("Connected to MQTT broker");
       client.subscribe("Coffee Rush");
       console.log("Subscribed to topic");
+      client.publish("Coffee Rush", "Subscribed to topic from react native");
     }
 
     function onMessageArrived(message) {
       latestMessage.current = message.payloadString;
       console.log("Received message:", message.payloadString);
-      setPeopleInQueue(parseInt(latestMessage.current)); 
-      console.log("Variable",peopleInQueue);
-      //requestAnimationFrame(updatePeopleInQueue);     
+      client.publish("Coffee Rush", "Received message from react native");
+      requestAnimationFrame(updatePeopleInQueue);     
       
     }
     
@@ -41,11 +41,12 @@ const HomePage = () => {
       setPeopleInQueue(parseInt(latestMessage.current)); 
       console.log("Variable",peopleInQueue);
     }
+    client.onMessageArrived = onMessageArrived;
     client.connect({
       onSuccess: onConnect,
     });
 
-    client.onMessageArrived = onMessageArrived;
+    
 
     
 
