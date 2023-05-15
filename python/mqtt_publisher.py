@@ -8,7 +8,7 @@ from paho.mqtt import client as mqtt_client
 
 broker = 'broker.emqx.io'
 port = 1883
-topic = "python/mqtt"
+topic = "Coffee Rush"
 # generate client ID with pub prefix randomly
 client_id = f'python-mqtt-{random.randint(0, 1000)}'
 # username = 'emqx'
@@ -41,7 +41,7 @@ def publish(client, n_persons=10):
 def run():
     client = connect_mqtt()
     client.loop_start()
-    publish(client)
+    publish(client,12)
 
 
 if __name__ == '__main__':

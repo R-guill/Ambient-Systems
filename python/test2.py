@@ -8,6 +8,7 @@
 import pyrealsense2 as rs
 import numpy as np
 import cv2
+import time
 from mqtt_publisher import connect_mqtt, publish
 
 def auto_canny(image, sigma=0.33):
@@ -105,17 +106,18 @@ try:
         # print(depth_colormap.shape)
         # Drawing the regions in the Image
         for (x, y, w, h) in regions:
-            cv2.rectangle(depth_colormap, (x, y), 
+            cv2.rectangle(color_image, (x, y), 
                         (x + w, y + h), 
                         (0, 0, 255), 2)
         n_persons = len(regions)
+        cv2.namedWindow('RealSense', cv2.WINDOW_AUTOSIZE)
+        cv2.imshow('RealSense', color_image)
+        cv2.waitKey(1)
         publish(client, n_persons)
+        time.sleep(1)
         # print(len(regions))
 
         # Show images
-        cv2.namedWindow('RealSense', cv2.WINDOW_AUTOSIZE)
-        cv2.imshow('RealSense', depth_colormap)
-        cv2.waitKey(1)
 
 finally:
 
