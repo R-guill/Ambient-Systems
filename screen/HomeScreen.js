@@ -8,6 +8,8 @@ import Header from "../assets/Header";
 import { Client } from "paho-mqtt";
 import waitTime from "../assets/WaitTime";
 import PersonBox from "../assets/PersonBox";
+import NavigationButton from "../assets/ChangeScreenButton";
+import { useNavigation } from "@react-navigation/native";
 
 const HomePage = () => {
   const [leftValue, setLeftValue] = useState(1);
@@ -17,55 +19,40 @@ const HomePage = () => {
   const [alertState, setalertState] = useState(false);
   const [peopleInQueue, setPeopleInQueue] = useState(0);
   const latestMessage = useRef(null);
-  
-  
-  
+
   useEffect(() => {
     const client = new Client("ws://broker.emqx.io:8083/mqtt", "clientId");
 
     function onConnect() {
       console.log("Connected to MQTT broker");
-      client.subscribe("CoffeeRush");
-      console.log("Subscribed to topic");
-      client.publish("CoffeeRush", "Subscribed to topic from react native");
+      client.subscribe("CoffeeRush/WaitingTime");
+      console.log("Subscribed to topic WaitingTime");
+      //client.publish("CoffeeRush/NPersons", "Subscribed to topic from react native");
     }
 
     function onMessageArrived(message) {
       latestMessage.current = message.payloadString;
       console.log("Received message:", latestMessage.current);
-      //client.publish("Coffee Rush", "Received message from react native");
-      setPeopleInQueue(parseInt(latestMessage.current)); 
-      
-     
-      
+      const [waitSeconds, nbPeople] = latestMessage.current.split(",");
+      setPeopleInQueue(nbPeople);
+  
+      const minutes = Math.floor(waitSeconds/60);
+      const seconds = waitSeconds%60;
+      setLeftValue(minutes);
+      setRightValue(seconds);
     }
-    
-    
+
     client.onMessageArrived = onMessageArrived;
     client.connect({
       onSuccess: onConnect,
     });
-    
-    
-
-    
 
     return () => {
       client.disconnect();
     };
-   }, []);
+  }, []);
 
-   useEffect(() => {
-    console.log("peopleInQueue",peopleInQueue);
-    const [min,sec]=waitTime(peopleInQueue);
-    setLeftValue(min);
-    setRightValue(sec);
-  }, [peopleInQueue]);
-  
-
-  
-
-  
+ 
 
   useEffect(() => {
     if (rightValue === 0 && leftValue === 0) {
@@ -96,6 +83,8 @@ const HomePage = () => {
     setalertState(!alertState);
   };
 
+  const navigation = useNavigation(); // Access the navigation object
+
   return (
     <View style={styles.container}>
       <Header text="Coffee Rush" />
@@ -105,12 +94,14 @@ const HomePage = () => {
         leftValue={leftValue}
         rightValue={rightValue.toString().padStart(2, "0")}
       />
+        
       <Popup
         isVisible={isPopupVisible}
         message={popUpmsg}
         onClose={onClosePopup}
       />
       <Button onPress={onButtonPress} />
+      <NavigationButton  navigation={navigation} destination="Timer" title="Mon Timer" />
       <View style={styles.imageContainer}>
         {alertState && (leftValue != 0 || rightValue != 0) && (
           <Image
@@ -155,6 +146,11 @@ const styles = StyleSheet.create({
   gif: {
     width: "100%",
     height: "100%",
+  },
+  buttonContainer: {
+    position: "absolute",
+    bottom: 20,
+    alignSelf: "center",
   },
 });
 
