@@ -55,9 +55,6 @@ const TimerPage = ({ navigation }) => {
   }, [isCounting, rightValue]);
 
   const handleButtonPress = () => {
-    console.log("leftValue", leftValue);
-    console.log("rightValue", rightValue);
-    console.log("isCounting", isCounting);
     if (isCounting ) {
       
       const client = new Client("ws://broker.emqx.io:8083/mqtt", "clientId");
@@ -67,6 +64,9 @@ const TimerPage = ({ navigation }) => {
         console.log("Connected to MQTT broker");
         client.publish("CoffeeRush/AddWaitingTime", seconds.toString());
         console.log("Published left and right values");
+        setLeftValue(0);
+        setRightValue(0);
+
       }
 
       client.connect({
