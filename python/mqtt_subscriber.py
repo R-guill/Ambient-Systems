@@ -31,9 +31,10 @@ def connect_mqtt() -> mqtt_client:
 
 def subscribe(client: mqtt_client):
     def on_message(client, userdata, msg):
-        np.append(load_data(), int(msg.payload.decode()))
+        data = list(load_data())
+        data.append( int(msg.payload.decode()))
         print(f"Received `{msg.payload.decode()}` from `{msg.topic}` topic")
-        save_data(load_data())
+        save_data(np.array(data))
 
     client.subscribe(topic)
     client.on_message = on_message

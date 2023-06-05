@@ -31,7 +31,6 @@ def connect_mqtt():
 
 def load_data():
     loaded_data = np.load(data_file_path)
-    print(f"Loaded data: {loaded_data}")
     return loaded_data
 
 def save_data(data):
@@ -39,19 +38,22 @@ def save_data(data):
 
 def publish(client, n_persons=10, waiting_time=int(load_data().mean())):
     waiting_time *= n_persons
-    result_n_persons = client.publish(n_persons_topic, n_persons)
-    result_waiting_time = client.publish(waiting_time_topic, waiting_time)
 
-    status_n_persons = result_n_persons[0]
+    # result_n_persons = client.publish(n_persons_topic, n_persons)
+    # result_waiting_time = client.publish(waiting_time_topic, waiting_time)
+    msg = str(waiting_time)+","+str(n_persons)
+    result_waiting_time = client.publish(waiting_time_topic, msg)
+
+
+    # status_n_persons = result_n_persons[0]
     status_waiting_time = result_waiting_time[0]
-    
-    if status_n_persons == 0:
-        print(f"Send `{n_persons}` to topic `{n_persons_topic}`...")
-    else:
-        print(f"Failed to send message to topic {n_persons_topic}")
+    # if status_n_persons == 0:
+    #     print(f"Send `{n_persons}` to topic `{n_persons_topic}`...")
+    # else:
+    #     print(f"Failed to send message to topic {n_persons_topic}")
     
     if status_waiting_time == 0:
-        print(f"Send `{waiting_time}` to topic `{waiting_time_topic}`...")
+        print(f"Send `{msg}` to topic `{waiting_time_topic}`...")
     else:
         print(f"Failed to send message to topic {waiting_time_topic}")
 
