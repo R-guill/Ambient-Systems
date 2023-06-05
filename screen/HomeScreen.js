@@ -8,6 +8,8 @@ import Header from "../assets/Header";
 import { Client } from "paho-mqtt";
 import waitTime from "../assets/WaitTime";
 import PersonBox from "../assets/PersonBox";
+import NavigationButton from "../assets/ChangeScreenButton";
+import { useNavigation } from "@react-navigation/native";
 
 const HomePage = () => {
   const [leftValue, setLeftValue] = useState(1);
@@ -17,59 +19,40 @@ const HomePage = () => {
   const [alertState, setalertState] = useState(false);
   const [peopleInQueue, setPeopleInQueue] = useState(0);
   const latestMessage = useRef(null);
-  
-  
+
   useEffect(() => {
     const client = new Client("ws://broker.emqx.io:8083/mqtt", "clientId");
 
     function onConnect() {
       console.log("Connected to MQTT broker");
-      client.subscribe("Coffee Rush");
-      console.log("Subscribed to topic");
+      client.subscribe("CoffeeRush/WaitingTime");
+      console.log("Subscribed to topic WaitingTime");
+      //client.publish("CoffeeRush/NPersons", "Subscribed to topic from react native");
     }
 
     function onMessageArrived(message) {
       latestMessage.current = message.payloadString;
-      console.log("Received message:", message.payloadString);
-      setPeopleInQueue(parseInt(latestMessage.current)); 
-      console.log("Variable",peopleInQueue);
-      //requestAnimationFrame(updatePeopleInQueue);     
-      
+      console.log("Received message:", latestMessage.current);
+      const [waitSeconds, nbPeople] = latestMessage.current.split(",");
+      setPeopleInQueue(nbPeople);
+  
+      const minutes = Math.floor(waitSeconds/60);
+      const seconds = waitSeconds%60;
+      setLeftValue(minutes);
+      setRightValue(seconds);
     }
-    
-    function updatePeopleInQueue() {
-      setPeopleInQueue(parseInt(latestMessage.current)); 
-      console.log("Variable",peopleInQueue);
-    }
+
+    client.onMessageArrived = onMessageArrived;
     client.connect({
       onSuccess: onConnect,
     });
 
-    client.onMessageArrived = onMessageArrived;
-
-    
-
     return () => {
       client.disconnect();
     };
-   }, []);
-
-   
-  
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setRightValue((prevRightValue) => {
-        if (prevRightValue > 0) {
-          return prevRightValue - 1;
-        } else {
-          return 0;
-        }
-      });
-    }, 1000);
-
-    return () => clearInterval(timer);
   }, []);
+
+ 
 
   useEffect(() => {
     if (rightValue === 0 && leftValue === 0) {
@@ -100,6 +83,8 @@ const HomePage = () => {
     setalertState(!alertState);
   };
 
+  const navigation = useNavigation(); // Access the navigation object
+
   return (
     <View style={styles.container}>
       <Header text="Coffee Rush" />
@@ -109,12 +94,14 @@ const HomePage = () => {
         leftValue={leftValue}
         rightValue={rightValue.toString().padStart(2, "0")}
       />
+        
       <Popup
         isVisible={isPopupVisible}
         message={popUpmsg}
         onClose={onClosePopup}
       />
       <Button onPress={onButtonPress} />
+      <NavigationButton  navigation={navigation} destination="Timer" title="Mon Timer" />
       <View style={styles.imageContainer}>
         {alertState && (leftValue != 0 || rightValue != 0) && (
           <Image
@@ -159,6 +146,11 @@ const styles = StyleSheet.create({
   gif: {
     width: "100%",
     height: "100%",
+  },
+  buttonContainer: {
+    position: "absolute",
+    bottom: 20,
+    alignSelf: "center",
   },
 });
 

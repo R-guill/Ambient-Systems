@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 
+
 const BlackBox = ({ value }) => {
   return (
     <View style={styles.box}>
@@ -27,7 +28,7 @@ const styles = StyleSheet.create({
   },
   box: {
     width: 150,
-    height: 200,
+    height: 150,
     backgroundColor: 'black',
     borderRadius: 10,
     margin: 5,
