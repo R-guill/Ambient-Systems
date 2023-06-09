@@ -13,4 +13,8 @@ Pour le backend on utilise un client MQTT de Python fourni par la bibliotheque P
 </ul>
 
 Pour lancer le backend, il suffit de tourner les scripts <em> python/mqtt_subscriber.py </em> et <em> python/stream_n_persons.py </em>, chacun dans une terminale differente.
+  
+## Frontend
+Le frontend est développé en React Native et Javascript. A cause de problème de compatibilité de modules, nous n'avons pas pu générer le fichier APK de l'application. Pour avoir le résultat, il faut exécuter en mode développement avec npx expo start par exemple. L'application est consitué de deux écrans : l'accueil et le timer. Sur la page d'acceuil, on lit le nombre de personnes présentes et le temps d'attente estimé et on peut demander une alarme quand il n'y a plus personne dans la queue, qui fera vibrer le téléphone.
+On a aussi la possibilité d'ouvrir la page du timer qui permet de chronométrer son temps d'attente à la machine à café et qui envoie le temps d'attente réel et le temps d'attente au moment de l'activation du timer. Cela permet d'améliorer l'estimation du temps d'attente en moyennant les données reçues.
 
